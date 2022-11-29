@@ -4,11 +4,13 @@ var rows,cols;
 var array = [];
 var sortArray=[];
 var arrayCreated=false;
+var comparison=0,swaps=0;
 function setArray() 
 {
 	array = [];
   vis=[];
   dist=[];
+  comparison=0,swaps=0;
 	for ( let i = 0; i < rows ; i++)
 	{
 		let row = [];
@@ -76,12 +78,15 @@ async function BubbleSort()
 {
 	console.log("HH");
 	var n=cols;
+	comparison=0,swaps=0;
 	for(var i=0;i<n;i++)
 	{
 		for(var j=0;j<n-1-i;j++)
 		{
 			if(sortArray[j]>sortArray[j+1])
 			{
+				swaps++;
+
 				var init=document.getElementById((0)+","+(j));
 				var final=document.getElementById((0)+","+(j+1));
 				init.style.backgroundColor="red";
@@ -103,6 +108,7 @@ async function BubbleSort()
 					        }, 1000))
 				
 			}
+			comparison++;
 		}
 		var fixed=document.getElementById((0)+","+(n-1-i));
 		fixed.style.backgroundColor="green";
@@ -111,7 +117,7 @@ async function BubbleSort()
 					          resolve();
 					        }, 1000))
 	}
-
+	
 }
 async function SelectionSort()
 {
@@ -119,6 +125,7 @@ async function SelectionSort()
 	// 2 7 6 4 5
 	// 2 4 6 7 5
 	var n=cols;	
+	comparison=0,swaps=0;
 	for(var i=0;i<n;i++)
 	{
 		var mn=sortArray[i];
@@ -157,6 +164,7 @@ async function SelectionSort()
 					traversed.style.backgroundColor="yellow";
 				}
 			}
+			comparison++;
 		}
 		
 		await new Promise((resolve) =>
@@ -170,9 +178,11 @@ async function SelectionSort()
 				}
 		}
 		var c=sortArray[i];
+		if(i!=pointer)
+			swaps++;
 		sortArray[i]=sortArray[pointer];
 		sortArray[pointer]=c;
-	
+		
 		var init=document.getElementById((0)+","+(i));
 		var final=document.getElementById((0)+","+(pointer));
 		final.style.backgroundColor="white";
@@ -186,10 +196,12 @@ async function SelectionSort()
 					        }, 1000))
 	}
 	console.log(sortArray);
+
 }
 async function InsertionSort()
 {
 	var n=cols;
+	comparison=0,swaps=0;
 	for(var i=0;i<n;i++)
 	{
 		var optimal=i;
@@ -205,6 +217,7 @@ async function InsertionSort()
 		{
 			if(sortArray[j]>sortArray[i])
 				{
+					comparison++;
 					optimal=j;
 					break;
 				}
@@ -216,6 +229,8 @@ async function InsertionSort()
 			var init=document.getElementById((0)+","+(j));
 				var final=document.getElementById((0)+","+(j+1));
 				var c=sortArray[j];
+				swaps++;
+
 				sortArray[j]=sortArray[j+1];
 				sortArray[j+1]=c;
 				final.innerText=sortArray[j+1];
@@ -237,6 +252,7 @@ async function InsertionSort()
 
 	}
 	console.log(sortArray);
+
 }
 function createArray()
 {
@@ -244,8 +260,9 @@ function createArray()
 	var arrayContainer=document.getElementById("SortAlgos");
 	var bubble='<button id="BubbleSort">BubbleSort</button>';
 	var selection='<button id="SelectionSort">SelectionSort</button>';
-	var insertion='<button id="InsertionSort">InsertionSort</button>'
-	arrayContainer.innerHTML=bubble+selection+insertion;
+	var insertion='<button id="InsertionSort">InsertionSort</button>';
+	var merge='<button id="MergeSort">MergeSort</button>';
+	arrayContainer.innerHTML=bubble+selection+insertion+merge;
 
 rows=1;
   cols=document.getElementById("Cols").value;
@@ -290,9 +307,145 @@ rows=1;
   var bubbleSort=document.getElementById("BubbleSort");
   var selectionSort=document.getElementById("SelectionSort");
   var insertionSort=document.getElementById("InsertionSort");
+  var mergeSort=document.getElementById("MergeSort");
  bubbleSort.addEventListener("click",BubbleSort);
  selectionSort.addEventListener("click",SelectionSort);
  insertionSort.addEventListener("click",InsertionSort);
+ mergeSort.addEventListener("click",MergeSort);
+}
+ async function MergeSortUtil(l,r)
+{
+
+if(l<r){
+	
+		var mid=(parseInt((l+r)/2));
+
+	 await MergeSortUtil(l,mid);
+	
+	 await MergeSortUtil(mid+1,r);
+	
+	await mergeUtil(l,mid,mid+1,r);
+	
+	for(var i=l;i<=mid;i++)
+	{
+		var init=document.getElementById((0)+","+(i));
+	
+		init.style.backgroundColor="red";
+	}
+	 for(var i=mid+1;i<=r;i++)
+	{
+		var init=document.getElementById((0)+","+(i));
+		
+		init.style.backgroundColor="blue";
+	}
+	for(var i=0;i<cols;i++)
+	{
+		var init=document.getElementById((0)+","+(i));
+		init.innerText=sortArray[i];
+	}
+	console.log(sortArray);
+	  await new Promise((resolve) =>
+        setTimeout(() => {
+          resolve();
+        }, 5000))
+	}
+	for(var i=l;i<=r;i++)
+	{
+		var init=document.getElementById((0)+","+(i));
+		
+		init.style.backgroundColor="white";
+	}
+}
+ function mergeUtil(l1,r1,l2,r2)
+{
+
+	var temp=[];
+	var i1=l1,i2=l2;
+	while((i1<=r1) && (i2<=r2))
+	{
+		if(sortArray[i1]<=sortArray[i2])
+		{
+			temp.push(sortArray[i1++]);
+		}
+		else
+		{
+			temp.push(sortArray[i2++]);
+		}
+	}
+	while(i1<=r1)
+	{
+		temp.push(sortArray[i1++]);
+	}
+	while(i2<=r2)
+	{
+		temp.push(sortArray[i2++]);
+	}
+	var j=0;
+	for(var pos=l1;pos<=r2;pos++)
+		sortArray[pos]=temp[j++];
+}
+var sortArray1=[];
+function dummyMergeSortUtil(l,r)
+{
+
+if(l<r){
+	
+		var mid=(parseInt((l+r)/2));
+
+	  dummyMergeSortUtil(l,mid);
+	
+	  dummyMergeSortUtil(mid+1,r);
+	
+	 dummymergeUtil(l,mid,mid+1,r);
+	
+}
+}
+ function dummymergeUtil(l1,r1,l2,r2)
+{
+
+	var temp=[];
+	var i1=l1,i2=l2;
+	while((i1<=r1) && (i2<=r2))
+	{
+		if(sortArray1[i1]<=sortArray1[i2])
+		{
+			temp.push(sortArray1[i1++]);
+		}
+		else
+		{
+			temp.push(sortArray1[i2++]);
+		}
+		comparison++;
+	}
+	while(i1<=r1)
+	{
+		temp.push(sortArray1[i1++]);
+		comparison++;
+	}
+	while(i2<=r2)
+	{
+		temp.push(sortArray1[i2++]);
+		comparison++;
+	}
+	var j=0;
+	for(var pos=l1;pos<=r2;pos++)
+		sortArray1[pos]=temp[j++];
+}
+function MergeSort()
+{
+
+	var n=cols;
+	comparison=0,swaps=0;
+MergeSortUtil(0,n-1);
+
+for(var i=0;i<sortArray.length;i++)
+sortArray1.push(sortArray[i]);
+var start = window.performance.now();
+dummyMergeSortUtil(0,n-1);
+// console.log(sortArray1);
+var end = window.performance.now();
+var time = end - start;
+console.log(time);
 }
 var createArrayButn=document.getElementById("array");
 createArrayButn.addEventListener("click",createArray);
